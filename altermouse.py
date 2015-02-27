@@ -4,8 +4,8 @@ currentPoint = Quartz.CGPointMake(0,0)
 
 def mouseMoved(proxy, t, event, refcon):
     # Do some sanity check.
-    if t != Quartz.kCGEventMouseMoved:
-        return event;
+    #if t != Quartz.kCGEventMouseMoved:
+        #return event;
 
     global currentPoint
     print "before (%f, %f)" % (currentPoint.x, currentPoint.y);
@@ -16,6 +16,9 @@ def mouseMoved(proxy, t, event, refcon):
     # For example, we can use CGEventSetLoction(event, newLocation).
     # Here, we just print the location.
     print "after (%f, %f)" % (currentPoint.x, currentPoint.y);
+    x = Quartz.CGEventGetIntegerValueField(event, Quartz.kCGTabletEventPointX)
+    y = Quartz.CGEventGetIntegerValueField(event, Quartz.kCGTabletEventPointY)
+    print "TabletEvent (%d, %d)" % (x, y)
 
     #moveMouse(CGPointMake(currentPoint.x+5, currentPoint.y+5));
 
@@ -36,9 +39,11 @@ def moveMouse(to):
 
 screenBounds = Quartz.CGDisplayBounds(Quartz.CGMainDisplayID())
 print 'the main screen is (%d, %d)' % (screenBounds.size.width, screenBounds.size.height)
-eventMask = (1 << Quartz.kCGEventMouseMoved)
+#eventMask = (1 << Quartz.kCGEventMouseMoved)
+#eventMask = (1 << Quartz.kCGEventMaskForAllEvents)
+
 eventTap = Quartz.CGEventTapCreate(Quartz.kCGSessionEventTap, Quartz.kCGHeadInsertEventTap,
-                            0, eventMask, mouseMoved, None)
+                            0, Quartz.kCGEventMaskForAllEvents, mouseMoved, None)
 if eventTap is None:
     print 'Failed to create tap event'
 
