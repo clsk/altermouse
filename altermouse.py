@@ -1,17 +1,21 @@
 import Quartz
 
+currentPoint = Quartz.CGPointMake(0,0)
+
 def mouseMoved(proxy, t, event, refcon):
     # Do some sanity check.
     if t != Quartz.kCGEventMouseMoved:
         return event;
 
+    global currentPoint
+    print "before (%f, %f)" % (currentPoint.x, currentPoint.y);
     # The incoming mouse position.
     currentPoint = Quartz.CGEventGetLocation(event);
 
     # We can change aspects of the mouse event.
     # For example, we can use CGEventSetLoction(event, newLocation).
     # Here, we just print the location.
-    print "(%f, %f)\n" % (currentPoint.x, currentPoint.y);
+    print "after (%f, %f)" % (currentPoint.x, currentPoint.y);
 
     #moveMouse(CGPointMake(currentPoint.x+5, currentPoint.y+5));
 
@@ -20,6 +24,14 @@ def mouseMoved(proxy, t, event, refcon):
 
 def timerCalled(timer, refcon):
     print 'timer Called'
+    moveMouse(Quartz.CGPointMake(currentPoint.x+1, currentPoint.y+1))
+
+def moveMouse(to):
+    evsrc = Quartz.CGEventSourceCreate(Quartz.kCGEventSourceStateCombinedSessionState);
+    Quartz.CGEventSourceSetLocalEventsSuppressionInterval(evsrc, 0.0);
+    Quartz.CGAssociateMouseAndMouseCursorPosition (0);
+    Quartz.CGWarpMouseCursorPosition(to);
+    Quartz.CGAssociateMouseAndMouseCursorPosition (1);
 
 
 screenBounds = Quartz.CGDisplayBounds(Quartz.CGMainDisplayID())
@@ -38,7 +50,7 @@ runLoopSource = Quartz.CFMachPortCreateRunLoopSource(
 Quartz.CFRunLoopAddSource(Quartz.CFRunLoopGetCurrent(), runLoopSource,
                    Quartz.kCFRunLoopCommonModes);
 
-timerEvent = Quartz.CFRunLoopTimerCreate(None, Quartz.CFAbsoluteTimeGetCurrent(), 0.2, 0, 0, timerCalled, None)
+timerEvent = Quartz.CFRunLoopTimerCreate(None, Quartz.CFAbsoluteTimeGetCurrent(), 0.3, 0, 0, timerCalled, None)
 if timerEvent is None:
     print 'timerEvent is None'
 
