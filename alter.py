@@ -17,7 +17,7 @@ class AppDelegate(NSObject):
         self.screenBounds = screenBounds
 
     def timeElapsed(self, t0, t1):
-        return t0 - t1
+        return t1 - t0
 
     def calcAcceleration(self, delta, k=1):
         return CGPointMake(delta.x*k, delta.y*k)
@@ -35,9 +35,9 @@ class AppDelegate(NSObject):
         #print dir(event)
         if self.p.x == 0 and self.p.y == 0:
             self.p = self.switchYOrigin(event.locationInWindow())
-        #print self.switchYOrigin(event.locationInWindow())
-        #print "delta D: (%d, %d)" % (event.deltaX(), event.deltaY())
-        delta = CGPointMake(event.deltaX(), event.deltaY())
+        print self.switchYOrigin(event.locationInWindow())
+        print "delta D: (%d, %d)" % (event.deltaX(), event.deltaY())
+        delta = self.switchYOrigin(CGPointMake(event.deltaX(), event.deltaY()))
         a = self.calcAcceleration(delta)
         self.v = self.calcVelocity(self.v, a)
 
@@ -48,11 +48,14 @@ class AppDelegate(NSObject):
                 self.timer, NSDefaultRunLoopMode)
 
     def updateCursor(self):
-        t1 = time()
-        te = self.timeElapsed(self.t, t1)
-        self.p = self.calcPosition(self.p, self.v, te)
-        self.moveMouse(self.p)
-        print 'updated cursor to ' + repr(self.p)
+        if self.p.x != 0 or self.p.y != 0:
+            t1 = time()
+            te = self.timeElapsed(self.t, t1)
+            print 'time elapsed: ' + repr(te)
+            self.p = self.calcPosition(self.p, self.v, te)
+            #self.moveMouse(self.p)
+            print 'updated cursor to ' + repr(self.p)
+            self.t = t1
 
     def moveMouse(self, to):
         evsrc = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
